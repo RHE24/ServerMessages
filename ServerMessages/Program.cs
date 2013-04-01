@@ -14,7 +14,7 @@ namespace ServerMessages
         static void Main(string[] args)
         {
             Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Reading messages...");
-            string messagesFile = File.ReadAllText(@"messages.txt");
+            string messagesFile = File.ReadAllText(@"messages.cfg");
             string[] messages = messagesFile.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Starting RCon, checking connection...");
@@ -122,7 +122,7 @@ namespace ServerMessages
 
         private static String getSetting(int x)
         {
-            using (var sr = new StreamReader(@"settings.txt"))
+            using (var sr = new StreamReader(@"settings.cfg"))
             {
                 for (int i = 1; i < x; i++)
                     sr.ReadLine();

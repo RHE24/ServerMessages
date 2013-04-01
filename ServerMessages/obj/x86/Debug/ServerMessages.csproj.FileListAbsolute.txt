@@ -5,3 +5,10 @@ c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessag
 c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\bin\Debug\BattleNET.dll
 c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\bin\Debug\BattleNET.pdb
 c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.csprojResolveAssemblyReference.cache
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.exe
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.pdb
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\bin\Debug\ServerMessages.exe
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\bin\Debug\ServerMessages.pdb
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\bin\Debug\BattleNET.dll
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\bin\Debug\BattleNET.pdb
+C:\Users\deniz\Documents\GitHub\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.csprojResolveAssemblyReference.cache
