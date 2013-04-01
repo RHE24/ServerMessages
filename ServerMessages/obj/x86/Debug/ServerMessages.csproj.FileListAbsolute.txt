@@ -1,0 +1,7 @@
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\bin\Debug\ServerMessages.exe
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\bin\Debug\ServerMessages.pdb
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.exe
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.pdb
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\bin\Debug\BattleNET.dll
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\bin\Debug\BattleNET.pdb
+c:\users\deniz\documents\visual studio 2010\Projects\ServerMessages\ServerMessages\obj\x86\Debug\ServerMessages.csprojResolveAssemblyReference.cache

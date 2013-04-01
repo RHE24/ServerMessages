@@ -1,0 +1,2 @@
+05:46:45~Example 1 msg
+14:05:00~Example 2 msg

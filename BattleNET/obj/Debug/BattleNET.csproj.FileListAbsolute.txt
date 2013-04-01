@@ -1,0 +1,4 @@
+C:\Users\deniz\Documents\Visual Studio 2010\Projects\ServerMessages\BattleNET\bin\Debug\BattleNET.dll
+C:\Users\deniz\Documents\Visual Studio 2010\Projects\ServerMessages\BattleNET\bin\Debug\BattleNET.pdb
+C:\Users\deniz\Documents\Visual Studio 2010\Projects\ServerMessages\BattleNET\obj\Debug\BattleNET.dll
+C:\Users\deniz\Documents\Visual Studio 2010\Projects\ServerMessages\BattleNET\obj\Debug\BattleNET.pdb
