@@ -26,7 +26,7 @@ namespace ServerMessages
                 if (timeLoop > 599)
                 {
                     Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Reading messages...");
-                    messagesFile = File.ReadAllText(@"messages.txt");
+                    messagesFile = File.ReadAllText(@"messages.cfg");
                     messages = messagesFile.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     timeLoop = 0;
                 }
