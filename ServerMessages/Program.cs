@@ -23,7 +23,8 @@ namespace ServerMessages
             // Creating necessary files if they don't exist yet
             createFile("messages.cfg");
             createFile("settings.cfg");
-            createFile("chat.log");
+            if(settings.saveChat == "true")
+                createFile("chat.log");
 
             // If savechat is true, connect, otherwise try connection and disconnect
             beConn.b.BattlEyeConnected += BattlEyeConnected;
