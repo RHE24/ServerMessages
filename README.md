@@ -6,7 +6,7 @@ RCon client for automatic global messages in ArmA 2.
 Requirements
 ============
 
-This client was built on .NET Framework 4.0.
+This client needs .NET Framework 4.0+.
 
 Credits
 =======

@@ -6,6 +6,7 @@ using System.Threading;
 using System.IO;
 using System.Net;
 using BattleNET;
+using System.Runtime.InteropServices;
 
 namespace ServerMessages
 {
@@ -13,83 +14,65 @@ namespace ServerMessages
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Reading messages...");
-            string messagesFile = File.ReadAllText(@"messages.cfg");
-            string[] messages = messagesFile.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Starting Client...");
 
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Starting RCon, checking connection...");
-            checkConnection();
+            // Handler to listen for close window
+            handler = new ConsoleEventDelegate(ConsoleEventCallback);
+            SetConsoleCtrlHandler(handler, true);
 
-            int timeLoop = 0;
-            while(true)
+            // Creating necessary files if they don't exist yet
+            createFile("messages.cfg");
+            createFile("settings.cfg");
+            createFile("chat.log");
+
+            // If savechat is true, connect, otherwise try connection and disconnect
+            beConn.b.BattlEyeConnected += BattlEyeConnected;
+            beConn.b.BattlEyeDisconnected += BattlEyeDisconnected;
+            if (settings.saveChat == "true")
             {
-                if (timeLoop > 599)
-                {
-                    Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Reading messages...");
-                    messagesFile = File.ReadAllText(@"messages.cfg");
-                    messages = messagesFile.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    timeLoop = 0;
-                }
-
-                foreach (string x in messages)
-                {
-                    string[] messageThis = x.Split('~');
-                    if (DateTime.Now.ToString("HH:mm:ss") == messageThis[0]) sayGlobal(messageThis[1]);
-                }
-
-                timeLoop++;
-                System.Threading.Thread.Sleep(1000);
+                beConn.b.BattlEyeMessageReceived += writeChatLog;
+                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Listening to chat...");
             }
-        }
+            beConn.b.ReconnectOnPacketLoss = true;
 
-        private static void checkConnection()
-        {
-            BattlEyeLoginCredentials loginCredentials = new BattlEyeLoginCredentials();
-            loginCredentials.Host = IPAddress.Parse(Settings.hostRcon);
-            loginCredentials.Port = Convert.ToInt16(Settings.portRcon);
-            loginCredentials.Password = Settings.passRcon;
-            BattlEyeClient b = new BattlEyeClient(loginCredentials);
-            b.BattlEyeConnected += BattlEyeConnected;
-            b.BattlEyeDisconnected += BattlEyeDisconnected;
-            b.ReconnectOnPacketLoss = false;
+            beConn.b.Connect();
 
-            b.Connect();
-            b.Disconnect();
+            // Start timeChecker
+            timeChecker timecheckObj = new timeChecker();
+            Thread timecheckThread = new Thread(timecheckObj.Check);
+            timecheckThread.Start();
         }
 
         private static void BattlEyeConnected(BattlEyeConnectEventArgs args)
         {
+            // This method decides what to do when getting connected to the BE server
             if (args.ConnectionResult == BattlEyeConnectionResult.Success)
             {
                 Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Succesful connection to BE server.");
             }
             if (args.ConnectionResult == BattlEyeConnectionResult.InvalidLogin)
             {
-                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Connection error: Invalid login! Press ENTER to exit");
+                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Connection error: Invalid login details! Please check your password in settings.cfg. Press ENTER to exit");
                 Console.ReadLine();
                 Environment.Exit(0);
             }
             if (args.ConnectionResult == BattlEyeConnectionResult.ConnectionFailed)
             {
                 Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Connection error: server unreachable! Checking connection in 5 seconds...");
-                System.Threading.Thread.Sleep(5000);
-                checkConnection();
+                Thread.Sleep(5000);
+                if(!beConn.b.Connected) beConn.b.Connect();
             }
         }
 
         private static void BattlEyeDisconnected(BattlEyeDisconnectEventArgs args)
         {
-            if (args.DisconnectionType == BattlEyeDisconnectionType.ConnectionLost)
-            {
-                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Connection lost: Packet exception! Checking connection in 5 seconds...");
-                System.Threading.Thread.Sleep(5000);
-                checkConnection();
-            }
+            // This method decides what to do when getting disconnected from the BE server
             if (args.DisconnectionType == BattlEyeDisconnectionType.SocketException)
             {
-                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Connection lost: Socket exception! Checking connection in 5seconds...");
-                System.Threading.Thread.Sleep(5000);
-                checkConnection();
+                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Connection lost: Socket exception! Reconnecting in 5 seconds...");
+                Thread.Sleep(5000);
+                if (!beConn.b.Connected) 
+                    beConn.b.Connect();
             }
             if (args.DisconnectionType == BattlEyeDisconnectionType.Manual)
             {
@@ -97,37 +80,57 @@ namespace ServerMessages
             }
         }
 
-        private static void sayGlobal(String saystr)
+        private static void writeChatLog(BattlEyeMessageEventArgs args)
         {
-            BattlEyeLoginCredentials loginCredentials = new BattlEyeLoginCredentials();
-            loginCredentials.Host = IPAddress.Parse(Settings.hostRcon);
-            loginCredentials.Port = Convert.ToInt16(Settings.portRcon);
-            loginCredentials.Password = Settings.passRcon;
-            BattlEyeClient b = new BattlEyeClient(loginCredentials);
-            b.BattlEyeConnected += BattlEyeConnected;
-            b.BattlEyeDisconnected += BattlEyeDisconnected;
-            b.ReconnectOnPacketLoss = true;
+            // This method writes sidechat to the log file
 
-            b.Connect();
-            b.SendCommand("Say -1 " + saystr);
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Said global: " + saystr);
-            b.Disconnect();
-        }
-    }
-    public class Settings
-    {
-        public static string hostRcon = getSetting(1);
-        public static string portRcon = getSetting(2);
-        public static string passRcon = getSetting(3);
-
-        private static String getSetting(int x)
-        {
-            using (var sr = new StreamReader(@"settings.cfg"))
+            // First check whether chat msg was a side-chat msg
+            if (args.Message.Substring(0, Math.Min(args.Message.Length, 6)) == "(Side)")
             {
-                for (int i = 1; i < x; i++)
-                    sr.ReadLine();
-                return sr.ReadLine().Remove(0, 5);
+                // Check if linecount >= amount specified
+                if (File.ReadLines(@"chat.log").Count() >= Convert.ToInt16(settings.splitChatLogAt))
+                {
+                    // If so, rename file and create new one
+                    string fileNameWithTime = "chat_" + DateTime.Now.ToString("dd_MM_yyyy-HH_mm_ss") + ".log";
+                    File.Move(@"chat.log", @fileNameWithTime);
+                    createFile("chat.log");
+                }
+                // Write to logfile
+                TextWriter chatlog = new StreamWriter(@"chat.log", append: true);
+                chatlog.WriteLine(args.Message.Remove(0, 7));
+                chatlog.Close();
+            }
+            
+        }
+
+        private static void createFile(String filename)
+        {
+            // This method creates files if they don't exist
+            if (!File.Exists(@filename))
+            {
+                using (FileStream fileCreate = File.Create(@filename))
+                {
+                    fileCreate.Close();  
+                }
+                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Created file: " + filename);
             }
         }
+
+        static bool ConsoleEventCallback(int eventType)
+        {
+            if (eventType == 2 || eventType == 0)
+            {
+                // Disconnect from server on close
+                if(beConn.b.Connected) 
+                    beConn.b.Disconnect();
+            }
+            return false;
+        }
+
+        // Close handler stuff
+        static ConsoleEventDelegate handler;
+        private delegate bool ConsoleEventDelegate(int eventType);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);
     }
 }
